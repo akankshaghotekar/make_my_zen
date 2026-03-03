@@ -33,7 +33,7 @@ class CommonDrawer extends StatelessWidget {
       //   page = const PurchasedSubscriptionScreen();
       //   break;
 
-      case "Order Personalized Healing":
+      case "Your Personalized Healing":
         page = const CartScreen();
         break;
 
@@ -117,7 +117,7 @@ class CommonDrawer extends StatelessWidget {
             _divider(),
             // _drawerItem(context, "Purchased Subscriptions"),
             // _divider(),
-            _drawerItem(context, "Order Personalized Healing"),
+            _drawerItem(context, "Your Personalized Healing"),
             _divider(),
             _drawerItem(context, "Edit Profile"),
             _divider(),

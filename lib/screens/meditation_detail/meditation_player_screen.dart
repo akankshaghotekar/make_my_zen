@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -25,6 +26,10 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
   Duration totalDuration = Duration.zero;
   Duration currentPosition = Duration.zero;
   bool isPlaying = false;
+  StreamSubscription<Duration>? _positionSub;
+  StreamSubscription<void>? _completeSub;
+  bool isReady = false;
+  bool isDurationReady = false;
 
   @override
   void initState() {
@@ -36,19 +41,23 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
 
   Future<void> _initPlayer() async {
     final file = await _downloadAudio(widget.audioUrl!);
-
     await _player.setSourceDeviceFile(file.path);
 
     final d = await _player.getDuration();
-    if (d != null) {
-      setState(() => totalDuration = d);
+    if (d != null && mounted) {
+      setState(() {
+        totalDuration = d;
+        isDurationReady = true;
+      });
     }
 
-    _player.onPositionChanged.listen((p) {
+    _positionSub = _player.onPositionChanged.listen((p) {
+      if (!mounted) return;
       setState(() => currentPosition = p);
     });
 
-    _player.onPlayerComplete.listen((_) {
+    _completeSub = _player.onPlayerComplete.listen((_) {
+      if (!mounted) return;
       setState(() => isPlaying = false);
     });
   }
@@ -67,6 +76,9 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
 
   @override
   void dispose() {
+    _positionSub?.cancel();
+    _completeSub?.cancel();
+    _player.stop();
     _player.dispose();
     super.dispose();
   }
@@ -129,7 +141,10 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
                       ),
                       SizedBox(height: 4.h),
                       Text(
-                        "${_format(currentPosition)} / ${_format(totalDuration)}",
+                        isDurationReady
+                            ? "${_format(currentPosition)} / ${_format(totalDuration)}"
+                            : "Loading audio...",
+
                         style: TextStyle(
                           fontSize: 14.sp,
                           color: Colors.grey.shade600,
@@ -141,7 +156,7 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
 
                 /// PLAY / PAUSE
                 GestureDetector(
-                  onTap: hasAudio
+                  onTap: hasAudio && isDurationReady
                       ? () async {
                           if (isPlaying) {
                             await _player.pause();
@@ -151,6 +166,7 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
                           setState(() => isPlaying = !isPlaying);
                         }
                       : null,
+
                   child: Container(
                     width: 46.w,
                     height: 46.w,
@@ -174,11 +190,12 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
             Slider(
               value: currentSeconds,
               max: maxSeconds,
-              onChanged: hasAudio
+              onChanged: hasAudio && isDurationReady
                   ? (value) async {
                       await _player.seek(Duration(seconds: value.toInt()));
                     }
                   : null,
+
               activeColor: Colors.pink,
               inactiveColor: Colors.grey.shade300,
             ),

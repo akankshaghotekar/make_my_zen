@@ -29,5 +29,17 @@ class MeditationComboModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'meditation_combo_srno': srNo,
+      'name': name,
+      'descr': description,
+      'img1': image,
+      'img2': audio,
+      'favourite': favouriteColor,
+      'commercials': commercials,
+    };
+  }
+
   bool get isFavourite => favouriteColor.toLowerCase() != '#777777';
 }

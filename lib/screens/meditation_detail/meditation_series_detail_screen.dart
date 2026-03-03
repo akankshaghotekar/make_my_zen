@@ -82,6 +82,18 @@ class _MeditationSeriesDetailScreenState
 
   @override
   Widget build(BuildContext context) {
+    final headerImage = comboDetail?.image.isNotEmpty == true
+        ? "https://makemyzen.com/make_my_zen/uploads/meditation_combo/${comboDetail!.image}"
+        : widget.image;
+
+    final headerTitle = comboDetail?.name.isNotEmpty == true
+        ? comboDetail!.name
+        : widget.title;
+
+    final headerCommercial = widget.commercials.isNotEmpty
+        ? widget.commercials
+        : "";
+
     return Scaffold(
       backgroundColor: AppColor.white,
 
@@ -99,41 +111,47 @@ class _MeditationSeriesDetailScreenState
       body: Column(
         children: [
           /// IMAGE
-          Image.network(
-            widget.image,
+          SizedBox(
             height: 260.h,
             width: double.infinity,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return const Center(child: CircularProgressIndicator());
-            },
-            errorBuilder: (_, __, ___) =>
-                const Icon(Icons.image_not_supported, size: 40),
+            child: headerImage.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : Image.network(
+                    headerImage,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Icon(Icons.image_not_supported, size: 40),
+                    ),
+                  ),
           ),
 
           SizedBox(height: 12.h),
 
           /// TITLE
           Text(
-            widget.title,
+            headerTitle,
             style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w700),
           ),
 
           SizedBox(height: 6.h),
 
           /// FREE TAG
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: Colors.pink.shade100,
-              borderRadius: BorderRadius.circular(20.r),
+          if (headerCommercial.isNotEmpty)
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: Colors.pink.shade100,
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              child: Text(
+                headerCommercial,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
-            child: Text(
-              widget.commercials,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
 
           SizedBox(height: 16.h),
 

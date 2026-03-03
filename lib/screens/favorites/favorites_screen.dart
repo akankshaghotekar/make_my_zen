@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:make_my_zen/api/api_service.dart';
 import 'package:make_my_zen/model/favorite_combo_model.dart';
+import 'package:make_my_zen/screens/meditation_detail/meditation_series_detail_screen.dart';
 import 'package:make_my_zen/shared_pref/shared_pref.dart';
+import 'package:make_my_zen/utils/animation_helper/animated_page_route.dart';
 
 import 'package:make_my_zen/utils/app_colors.dart';
 import 'package:make_my_zen/utils/common/common_bottom_nav.dart';
@@ -97,17 +99,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               itemBuilder: (context, index) {
                 final item = favorites[index];
 
-                return Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 14.h,
-                  ),
-                  child: Text(
-                    item.name,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      AnimatedPageRoute(
+                        page: MeditationSeriesDetailScreen(
+                          title: item.name,
+                          image: "",
+                          comboSrNo: item.srNo,
+                          commercials: "",
+                        ),
+                      ),
+                    );
+                  },
+
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 14.h,
+                    ),
+                    child: Text(
+                      item.name,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 );

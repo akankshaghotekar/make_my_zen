@@ -150,7 +150,7 @@ class _SubscriptionPaymentScreenState extends State<SubscriptionPaymentScreen> {
 
             /// PAY BUTTON
             CommonGradientButton(
-              title: "Place Order",
+              title: "Submit For Personalized Meditation",
               onTap: isPlacingOrder ? null : _placeOrder,
             ),
 
@@ -239,9 +239,9 @@ class _SubscriptionPaymentScreenState extends State<SubscriptionPaymentScreen> {
       debugPrint("Order placed successfully");
       debugPrint("Order SRNO: ${res.orderSrNo}");
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Order placed successfully")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Submit successfully")));
 
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.pushAndRemoveUntil(
@@ -256,7 +256,7 @@ class _SubscriptionPaymentScreenState extends State<SubscriptionPaymentScreen> {
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(res?.message ?? "Order failed")));
+      ).showSnackBar(SnackBar(content: Text(res?.message ?? "failed")));
     }
   }
 }

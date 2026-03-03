@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:make_my_zen/api/api_service.dart';
@@ -22,6 +23,8 @@ class _SelectMeditationScreenState extends State<SelectMeditationScreen> {
   void initState() {
     super.initState();
     _loadMeditations();
+    PaintingBinding.instance.imageCache.maximumSize = 200;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 50 << 20;
   }
 
   Future<void> _loadMeditations() async {
@@ -79,7 +82,16 @@ class _SelectMeditationScreenState extends State<SelectMeditationScreen> {
             /// GRID OPTIONS
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? GridView.builder(
+                      itemCount: 6,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 14.w,
+                        mainAxisSpacing: 16.h,
+                        childAspectRatio: 0.9,
+                      ),
+                      itemBuilder: (_, __) => _shimmerCard(),
+                    )
                   : GridView.builder(
                       itemCount: meditationList.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -239,12 +251,29 @@ class _SelectMeditationScreenState extends State<SelectMeditationScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14.r),
-                child: Image.network(
-                  "https://makemyzen.com/make_my_zen/uploads/meditation_type/$image",
+                child: CachedNetworkImage(
+                  imageUrl:
+                      "https://makemyzen.com/make_my_zen/uploads/meditation_type/$image",
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.image_not_supported),
+                  fadeInDuration: const Duration(milliseconds: 300),
+
+                  /// While image is loading
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.pink,
+                    ),
+                  ),
+
+                  /// If image fails
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.image_not_supported),
+                  ),
                 ),
               ),
             ),
@@ -257,6 +286,33 @@ class _SelectMeditationScreenState extends State<SelectMeditationScreen> {
               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _shimmerCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+            ),
+          ),
+          Container(
+            height: 14.h,
+            margin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            color: Colors.grey.shade300,
           ),
         ],
       ),

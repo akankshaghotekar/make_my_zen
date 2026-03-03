@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:make_my_zen/api/api_service.dart';
@@ -37,18 +38,39 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadBlessing();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadHomeData();
+    });
+  }
+
+  Future<void> _loadHomeData() async {
     _loadHealingModalities();
     _loadMeditationCombos();
+    _loadBlessing();
   }
 
   Future<void> _loadMeditationCombos() async {
     final userSrNo = await SharedPrefHelper.getUserSrNo();
     if (userSrNo == null) return;
 
+    await Future.delayed(const Duration(milliseconds: 100));
+    final cached = await SharedPrefHelper.getCachedCombos();
+    if (cached != null && mounted) {
+      setState(() {
+        meditationCombos = cached;
+        for (final combo in cached) {
+          _localFavourite[combo.srNo] = combo.isFavourite;
+        }
+        isComboLoading = false;
+      });
+    }
+
     final res = await ApiService.getComboHealings(userSrNo);
 
     if (!mounted) return;
+
+    await SharedPrefHelper.saveCachedCombos(res);
 
     setState(() {
       meditationCombos = res;
@@ -60,6 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadHealingModalities() async {
+    final cached = await SharedPrefHelper.getCachedHealingModalities();
+    if (cached != null && mounted) {
+      setState(() {
+        healingModalities = cached;
+        isHealingLoading = false;
+      });
+    }
+
     final res = await ApiService.getHealingModalities();
 
     if (!mounted) return;
@@ -169,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: CommonGradientButton(
-                title: "Order Personalized Healing",
+                title: "Get Your Personalized Healing",
                 onTap: () {
                   Navigator.push(
                     context,
@@ -196,24 +226,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: SizedBox(
                 height: 235.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 10.h),
+                child: RepaintBoundary(
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    cacheExtent: 300,
+                    addRepaintBoundaries: true,
+                    addAutomaticKeepAlives: true,
+                    padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 10.h),
 
-                  children: isHealingLoading
-                      ? [const Center(child: CircularProgressIndicator())]
-                      : healingModalities.map((item) {
-                          return Padding(
-                            padding: EdgeInsets.only(right: 12.w),
-                            child: _simpleMeditateCard(
-                              context: context,
-                              image:
-                                  "https://makemyzen.com/make_my_zen/uploads/healing_modalities/${item.image}",
-                              title: item.name,
-                              healingModalitiesSrNo: item.srNo,
-                            ),
-                          );
-                        }).toList(),
+                    children: isHealingLoading
+                        ? List.generate(3, (_) => _skeletonCard())
+                        : healingModalities.map((item) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 12.w),
+                              child: _simpleMeditateCard(
+                                context: context,
+                                image:
+                                    "https://makemyzen.com/make_my_zen/uploads/healing_modalities/${item.image}",
+                                title: item.name,
+                                healingModalitiesSrNo: item.srNo,
+                              ),
+                            );
+                          }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -230,20 +265,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: SizedBox(
                 height: 250.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 10.h),
-                  children: isComboLoading
-                      ? [const Center(child: CircularProgressIndicator())]
-                      : meditationCombos.map((item) {
-                          return Padding(
-                            padding: EdgeInsets.only(right: 12.w),
-                            child: _simpleSeriesCard(
-                              context: context,
-                              combo: item,
-                            ),
-                          );
-                        }).toList(),
+                child: RepaintBoundary(
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    cacheExtent: 300,
+                    addRepaintBoundaries: true,
+                    addAutomaticKeepAlives: true,
+                    padding: EdgeInsets.fromLTRB(12.w, 4.h, 12.w, 10.h),
+                    children: isComboLoading
+                        ? List.generate(
+                            3,
+                            (_) => _skeletonCard(width: 220, height: 250),
+                          )
+                        : meditationCombos.map((item) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 12.w),
+                              child: _simpleSeriesCard(
+                                context: context,
+                                combo: item,
+                              ),
+                            );
+                          }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -253,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: CommonGradientButton(
-                title: "Order Personalized Healing",
+                title: "Get Your Personalized Healing",
                 onTap: () {
                   Navigator.push(
                     context,
@@ -267,9 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       /// FLOATING BOTTOM NAV
-      bottomNavigationBar: const CommonBottomNav(
-        currentIndex: 0, // Home tab
-      ),
+      bottomNavigationBar: const CommonBottomNav(currentIndex: 0),
     );
   }
 
@@ -328,13 +369,16 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-              child: Image.network(
-                image,
+              child: CachedNetworkImage(
+                imageUrl: image,
                 height: 150.h,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.image_not_supported),
+                placeholder: (_, __) => Container(color: Colors.grey.shade300),
+                errorWidget: (_, __, ___) =>
+                    const Icon(Icons.broken_image, size: 40),
+                memCacheHeight: 300,
+                memCacheWidth: 400,
               ),
             ),
             Padding(
@@ -372,7 +416,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Container(
-        width: 200.w,
+        width: 220.w,
         decoration: BoxDecoration(
           color: AppColor.white,
           borderRadius: BorderRadius.circular(16.r),
@@ -393,11 +437,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(16.r),
                   ),
-                  child: Image.network(
-                    "https://makemyzen.com/make_my_zen/uploads/meditation_combo/${combo.image}",
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        "https://makemyzen.com/make_my_zen/uploads/meditation_combo/${combo.image}",
                     height: 130.h,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    placeholder: (_, __) =>
+                        Container(color: Colors.grey.shade300),
+                    errorWidget: (_, __, ___) =>
+                        const Icon(Icons.broken_image, size: 40),
+                    memCacheHeight: 300,
                   ),
                 ),
                 Positioned(
@@ -479,6 +529,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _skeletonCard({double width = 200, double height = 235}) {
+    return Container(
+      width: width.w,
+      margin: EdgeInsets.only(right: 12.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(16.r),
       ),
     );
   }

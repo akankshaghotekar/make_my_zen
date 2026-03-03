@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:make_my_zen/api/api_service.dart';
@@ -200,12 +201,29 @@ class _VisualizationStepScreenState extends State<VisualizationStepScreen> {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: Image.network(
-                  "https://makemyzen.com/make_my_zen/uploads/visulization/$image",
+                child: CachedNetworkImage(
+                  imageUrl:
+                      "https://makemyzen.com/make_my_zen/uploads/visulization/$image",
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.image_not_supported),
+                  fadeInDuration: const Duration(milliseconds: 300),
+
+                  /// Loader while image loads
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.pink,
+                    ),
+                  ),
+
+                  /// Error case
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.image_not_supported),
+                  ),
                 ),
               ),
             ),

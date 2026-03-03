@@ -47,20 +47,21 @@ class _RegisterDetailsScreenState extends State<RegisterDetailsScreen> {
   }
 
   Future<void> _loadDropdownData() async {
-    final ageRes = await ApiService.getAgeGroups();
-    final countryRes = await ApiService.getCountries();
-    final langRes = await ApiService.getLanguages();
+    final results = await Future.wait([
+      ApiService.getAgeGroups(),
+      ApiService.getCountries(),
+      ApiService.getLanguages(),
+    ]);
 
-    setState(() {
-      ageGroups = ageRes;
-      countries = countryRes;
-      languages = langRes;
-    });
+    ageGroups = results[0] as List<AgeGroupModel>;
+    countries = results[1] as List<CountryModel>;
+    languages = results[2] as List<LanguageModel>;
 
     if (widget.isEditProfile && widget.userSrNo != null) {
       await _loadUserProfile();
     }
 
+    if (!mounted) return;
     setState(() => isLoading = false);
   }
 

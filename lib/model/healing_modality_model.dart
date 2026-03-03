@@ -19,4 +19,13 @@ class HealingModalityModel {
       image: json['img1'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'healing_modalities_srno': srNo,
+      'name': name,
+      'descr': description,
+      'img1': image,
+    };
+  }
 }
