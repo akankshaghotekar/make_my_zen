@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:make_my_zen/utils/app_colors.dart';
-import 'package:path_provider/path_provider.dart';
 
 class MeditationPlayerScreen extends StatefulWidget {
   final String title;
@@ -40,8 +38,7 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
   }
 
   Future<void> _initPlayer() async {
-    final file = await _downloadAudio(widget.audioUrl!);
-    await _player.setSourceDeviceFile(file.path);
+    await _player.setSourceUrl(widget.audioUrl!);
 
     final d = await _player.getDuration();
     if (d != null && mounted) {
@@ -60,18 +57,6 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
       if (!mounted) return;
       setState(() => isPlaying = false);
     });
-  }
-
-  Future<File> _downloadAudio(String url) async {
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/${url.split('/').last}');
-
-    if (!await file.exists()) {
-      final res = await http.get(Uri.parse(url));
-      await file.writeAsBytes(res.bodyBytes);
-    }
-
-    return file;
   }
 
   @override

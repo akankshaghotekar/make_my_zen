@@ -138,19 +138,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 onTap: isLoading
                     ? null
                     : () {
-                        if (isLoginSelected) {
-                          if (_emailController.text.trim().isEmpty ||
-                              !_emailController.text.contains('@')) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Please enter a valid email"),
-                              ),
-                            );
-                            return;
-                          }
+                        /// EMAIL VALIDATION (for both login & register)
+                        if (_emailController.text.trim().isEmpty ||
+                            !_emailController.text.contains('@')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please enter a valid email"),
+                            ),
+                          );
+                          return;
+                        }
 
+                        /// LOGIN FLOW
+                        if (isLoginSelected) {
                           _handleLogin();
-                        } else {
+                        }
+                        /// REGISTER FLOW
+                        else {
                           Navigator.push(
                             context,
                             AnimatedPageRoute(
