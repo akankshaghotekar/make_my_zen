@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 200.w,
               height: 200.w,
               child: Image.asset(
-                'assets/images/make-my-zen-logo.png',
+                'assets/images/make_my_zen_app_icon.png',
                 fit: BoxFit.contain,
               ),
             ),
