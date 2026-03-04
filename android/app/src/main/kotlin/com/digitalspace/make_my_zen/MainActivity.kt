@@ -1,4 +1,4 @@
-package com.example.make_my_zen
+package com.digitalspace.makemyzen
 
 import io.flutter.embedding.android.FlutterActivity
 
