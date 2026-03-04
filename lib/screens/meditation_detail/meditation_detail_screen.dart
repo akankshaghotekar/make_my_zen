@@ -72,7 +72,10 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
-        title: Image.asset('assets/images/make-my-zen-logo.png', height: 36.h),
+        title: Image.asset(
+          'assets/images/make_my_zen_app_icon.png',
+          height: 36.h,
+        ),
       ),
 
       body: SingleChildScrollView(

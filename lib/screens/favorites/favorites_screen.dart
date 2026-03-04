@@ -74,7 +74,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
             centerTitle: true,
             title: Image.asset(
-              'assets/images/make-my-zen-logo.png',
+              'assets/images/make_my_zen_app_icon.png',
               height: 36.h,
             ),
           ),

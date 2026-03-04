@@ -101,7 +101,7 @@ class CommonDrawer extends StatelessWidget {
                   /// CENTER LOGO
                   Center(
                     child: Image.asset(
-                      'assets/images/make-my-zen-logo.png',
+                      'assets/images/make_my_zen_app_icon.png',
                       height: 80.h,
                     ),
                   ),

@@ -75,7 +75,7 @@ class _CartTherapyDetailScreenState extends State<CartTherapyDetailScreen> {
             ),
             centerTitle: true,
             title: Image.asset(
-              'assets/images/make-my-zen-logo.png',
+              'assets/images/make_my_zen_app_icon.png',
               height: 36.h,
             ),
           ),
@@ -118,7 +118,7 @@ class _CartTherapyDetailScreenState extends State<CartTherapyDetailScreen> {
                           image: DecorationImage(
                             image: detail!.fileName == null
                                 ? const AssetImage(
-                                    'assets/images/make-my-zen-logo.png',
+                                    'assets/images/make_my_zen_app_icon.png',
                                   )
                                 : AssetImage(widget.image),
                             fit: BoxFit.cover,

@@ -71,7 +71,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen>
             ),
             centerTitle: true,
             title: Image.asset(
-              'assets/images/make-my-zen-logo.png',
+              'assets/images/make_my_zen_app_icon.png',
               height: 36.h,
             ),
           ),

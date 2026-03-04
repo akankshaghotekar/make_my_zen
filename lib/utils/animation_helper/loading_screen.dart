@@ -39,7 +39,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/make-my-zen-logo.png', width: 120.w),
+            Image.asset('assets/images/make_my_zen_app_icon.png', width: 120.w),
             SizedBox(height: 16.h),
             Text(
               "Loading...",

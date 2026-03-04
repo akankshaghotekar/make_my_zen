@@ -50,7 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 40.h),
 
               /// LOGO
-              Image.asset('assets/images/make-my-zen-logo.png', width: 110.w),
+              Image.asset(
+                'assets/images/make_my_zen_app_icon.png',
+                width: 110.w,
+              ),
 
               SizedBox(height: 32.h),
 
