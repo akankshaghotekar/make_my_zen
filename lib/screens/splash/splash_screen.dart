@@ -40,39 +40,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: MQ.width(context),
         height: MQ.height(context),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColor.pink, AppColor.purple, AppColor.blue],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 200.w,
-              height: 200.w,
-              child: Image.asset(
-                'assets/images/make_my_zen_app_icon.png',
-                fit: BoxFit.contain,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              'MakeMyZen',
-              style: TextStyle(
-                fontSize: 22.sp,
-                color: AppColor.white,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 1,
-              ),
-            ),
-          ],
-        ),
+        child: Image.asset('assets/images/Splash2.png', fit: BoxFit.cover),
       ),
     );
   }

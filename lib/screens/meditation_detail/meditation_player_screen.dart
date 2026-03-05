@@ -19,6 +19,8 @@ class MeditationPlayerScreen extends StatefulWidget {
 class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
   final AudioPlayer _player = AudioPlayer();
 
+  bool _isDisposed = false;
+
   bool get hasAudio => widget.audioUrl != null && widget.audioUrl!.isNotEmpty;
 
   Duration totalDuration = Duration.zero;
@@ -38,33 +40,48 @@ class _MeditationPlayerScreenState extends State<MeditationPlayerScreen> {
   }
 
   Future<void> _initPlayer() async {
-    await _player.setSourceUrl(widget.audioUrl!);
+    if (!mounted) return;
 
-    final d = await _player.getDuration();
-    if (d != null && mounted) {
-      setState(() {
-        totalDuration = d;
-        isDurationReady = true;
+    try {
+      await _player.setSourceUrl(widget.audioUrl!);
+
+      if (!mounted) return;
+
+      final d = await _player.getDuration();
+
+      if (!mounted) return;
+
+      if (d != null) {
+        if (!mounted || _isDisposed) return;
+        setState(() {
+          totalDuration = d;
+          isDurationReady = true;
+        });
+      }
+
+      _positionSub = _player.onPositionChanged.listen((p) {
+        if (!mounted || _isDisposed) return;
+        setState(() => currentPosition = p);
       });
+
+      _completeSub = _player.onPlayerComplete.listen((_) {
+        if (!mounted || _isDisposed) return;
+        setState(() => isPlaying = false);
+      });
+    } catch (e) {
+      debugPrint("Audio init error: $e");
     }
-
-    _positionSub = _player.onPositionChanged.listen((p) {
-      if (!mounted) return;
-      setState(() => currentPosition = p);
-    });
-
-    _completeSub = _player.onPlayerComplete.listen((_) {
-      if (!mounted) return;
-      setState(() => isPlaying = false);
-    });
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
+
     _positionSub?.cancel();
     _completeSub?.cancel();
-    _player.stop();
+
     _player.dispose();
+
     super.dispose();
   }
 
