@@ -96,6 +96,8 @@ class _CartTherapyDetailScreenState extends State<CartTherapyDetailScreen> {
                     AnimatedPageRoute(
                       page: MeditationPlayerScreen(
                         title: detail!.meditationType,
+                        audioUrl:
+                            "https://makemyzen.com/make_my_zen/uploads/personalisedHealing/${detail!.fileName}",
                       ),
                     ),
                   );
